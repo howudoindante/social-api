@@ -11,31 +11,31 @@ datasource db {
 }
 
 model Credentials {
-  id               Int     @id @default(autoincrement())
-  email            String  @unique
-  password         String
-  passwordSalt     String
-  activationLink   String?
-  isActivated      Boolean @default(false)
-  user             User    @relation(fields: [relatedProfileId], references: [id])
-  relatedProfileId Int
+  id             Int     @id @default(autoincrement())
+  email          String  @unique
+  password       String
+  passwordSalt   String
+  activationCode Int?
+  isActivated    Boolean @default(false)
+  User           User?
 }
 
 model User {
-  id           Int           @id @default(autoincrement())
-  firstName    String
-  lastName     String
-  lastOnlineAt DateTime      @default(now())
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  bio          String?
-  Credentials  Credentials[]
-  Token        Token[]
-  role         Role          @relation(fields: [roleId], references: [id])
-  roleId       Int
-  UserIpList   UserIpList[]
-  Sender       Friendship[]  @relation("sender")
-  Recipient    Friendship[]  @relation("recipient")
+  id            Int          @id @default(autoincrement())
+  firstName     String
+  lastName      String
+  lastOnlineAt  DateTime     @default(now())
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  bio           String?
+  Token         Token[]
+  role          Role         @relation(fields: [roleId], references: [id])
+  roleId        Int
+  UserIpList    UserIpList[]
+  Sender        Friendship[] @relation("sender")
+  Recipient     Friendship[] @relation("recipient")
+  credentials   Credentials? @relation(fields: [relatedCredId], references: [id])
+  relatedCredId Int?         @unique
 }
 
 model Role {

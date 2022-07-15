@@ -1,26 +1,43 @@
-import { Injectable } from '@nestjs/common';
-import { CreateAuthInput } from './dto/create-auth.input';
-import { UpdateAuthInput } from './dto/update-auth.input';
-
+import { BadRequestException, Injectable } from '@nestjs/common';
+import * as bcrypt from 'bcryptjs';
+import { PrismaClient } from '@prisma/client';
+import isEmail from 'validator/lib/isEmail';
+const prisma = new PrismaClient();
 @Injectable()
 export class AuthService {
-  create(createAuthInput: CreateAuthInput) {
-    return 'This action adds a new auth';
+  async register(email: string, password: string) {
+    if (!isEmail(email)) throw new BadRequestException();
+    const isEmailAvaialble = !(await prisma.credentials.findUnique({
+      where: {
+        email,
+      },
+    }));
+    const salt = bcrypt.genSaltSync(10);
+    const hashed = bcrypt.hashSync(password, salt);
+    if (isEmailAvaialble) {
+      await prisma.credentials.create({
+        data: {
+          email,
+          password: hashed,
+          passwordSalt: salt,
+        },
+      });
+      return { message: 'Register' };
+    } else {
+      throw new BadRequestException();
+    }
   }
-
-  findAll() {
-    return `This action returns all auth`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
-
-  update(id: number, updateAuthInput: UpdateAuthInput) {
-    return `This action updates a #${id} auth`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+  async login(email: string, password: string) {
+    const isUserRegistered = await prisma.credentials.findUnique({
+      where: {
+        email,
+      },
+    });
+    if (isUserRegistered) {
+      return { message: 'Successfully logged in' };
+    } else {
+      throw new BadRequestException();
+    }
+    return { message: '213' };
   }
 }
