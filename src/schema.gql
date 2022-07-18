@@ -7,11 +7,69 @@ type Auth {
   message: String!
 }
 
+type PublicCredentials {
+  id: Int!
+  email: String!
+}
+
+type JWT {
+  refreshToken: String!
+  refresh_expires_in: Float!
+  accessToken: String!
+  access_expires_in: Float!
+}
+
+type Login {
+  credentials: PublicCredentials!
+  jwt: JWT!
+}
+
+type PrivateCredentials {
+  """Unique id field"""
+  id: Float!
+
+  """Email field"""
+  email: String!
+
+  """Account password"""
+  password: String!
+
+  """Password salt for hash password"""
+  passwordSalt: String!
+
+  """Code used for activation"""
+  verificationCode: Float!
+
+  """Activation param"""
+  isActivated: Boolean!
+}
+
+type Token {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
 type Query {
-  getLogin: Auth!
+  requestVerification: Auth!
+  getCredentials(accessToken: String!, email: String!): PrivateCredentials!
 }
 
 type Mutation {
+  verificateAccount(code: Float!): Auth!
   register(email: String!, password: String!): Auth!
-  login(email: String!, password: String!): Auth!
+  login(email: String!, password: String!): Login!
+  createToken(createTokenInput: CreateTokenInput!): Token!
+  updateToken(updateTokenInput: UpdateTokenInput!): Token!
+  removeToken(id: Int!): Token!
+}
+
+input CreateTokenInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input UpdateTokenInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
 }

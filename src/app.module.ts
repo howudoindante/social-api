@@ -4,6 +4,9 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloServerPluginLandingPageLocalDefault } from 'apollo-server-core';
 import { join } from 'path';
 import { AuthModule } from './auth/auth.module';
+import { CredentialsModule } from './credentials/credentials.module';
+import { TokenModule } from './token/token.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -12,8 +15,13 @@ import { AuthModule } from './auth/auth.module';
       playground: false,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
       plugins: [ApolloServerPluginLandingPageLocalDefault()],
+      cors: { origin: true, credentials: true },
+      context: ({ req }) => ({ req }),
     }),
     AuthModule,
+    CredentialsModule,
+    TokenModule,
+    UsersModule,
   ],
 })
 export class AppModule {}
