@@ -16,6 +16,13 @@ async function main() {
       },
     });
   }
+  await prisma.credentials.create({
+    data: {
+      email: '123@mail.ru',
+      password: '$2a$10$7.Un2CXdvZf8Mp1sgUV7yugSYGNUsEWGQC6kBHjD15kT27k2NWo8m',
+      passwordSalt: '$2a$10$7.Un2CXdvZf8Mp1sgUV7yu',
+    },
+  });
 }
 
 main()

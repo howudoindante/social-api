@@ -3,10 +3,19 @@ import { PrismaClient } from '@prisma/client';
 import { PrivateCredentials } from './entities/credentials-private.entity';
 import * as bcrypt from 'bcryptjs';
 import { _ } from 'lodash';
-import emailjs from '@emailjs/browser';
 import { EMAIL_ACCOUNT_VERIFICATION } from 'constants/Mail';
 import isEmail from 'validator/lib/isEmail';
+import * as nodemailer from 'nodemailer';
 const prisma = new PrismaClient();
+const transporter = nodemailer.createTransport({
+  host: 'smtp.gmail.com',
+  port: 465,
+  auth: {
+    user: process.env.COMPANY_EMAIL_LOGIN,
+    pass: process.env.COMPANY_EMAIL_PASSWORD,
+  },
+  secure: true,
+});
 @Injectable()
 export class CredentialsService {
   async findOne(email: string): Promise<PrivateCredentials | null> {
@@ -42,32 +51,23 @@ export class CredentialsService {
     await this.update({ email }, { verificationCode: code });
     return code;
   }
+
   async sendVerificationCode(email) {
     if (!isEmail(email)) throw new HttpException("It's not email", 400);
     const code = await this.generateVerificationCode(email);
+    const mailData = {
+      from: 'Chat',
+      to: email,
+      subject: 'Sending Email using Node.js',
+      text: 'That was easy!',
+      html: '<b>Hey there! </b><br> This is our first message sent with Nodemailer<br/>',
+    };
 
-    // emailjs
-    //   .send(
-    //     'service_px9gr7a',
-    //     'template_34ci2gv',
-    //     {
-    //       purpose: EMAIL_ACCOUNT_VERIFICATION,
-    //       verificationCode: code,
-    //       email: email,
-    //       reply_to: 'chat',
-    //     },
-    //     '-6zYoSs7_HOsgOiiM',
-    //   )
-    //   .then(
-    //     function (response) {
-    //       console.log('SUCCESS!', response.status, response.text);
-    //     },
-    //     function (error) {
-    //       console.log('FAILED...', error);
-    //     },
-    //   );
+    transporter.sendMail(mailData, function (err, info) {
+      if (err) console.log(err);
+      else console.log(info);
+    });
   }
-
   updateActivation() {
     return;
   }

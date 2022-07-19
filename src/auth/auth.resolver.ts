@@ -12,6 +12,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { Auth } from './entities/auth.entity';
 import { Login } from './entities/login.entity';
+import { Status } from './entities/status.entity';
 
 @Resolver(() => Auth)
 export class AuthResolver {
@@ -27,6 +28,10 @@ export class AuthResolver {
   @Mutation(() => Auth)
   register(@Args('email') email: string, @Args('password') password: string) {
     return this.authService.register(email, password);
+  }
+  @Mutation(() => Status)
+  async logout(@Args('email') email: string) {
+    return this.authService.logout(email);
   }
   @Mutation(() => Login)
   async login(

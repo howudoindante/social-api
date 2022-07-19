@@ -39,12 +39,23 @@ export class AuthService {
     );
 
     if (isCredentialsRight) {
-      const jwt = this.tokenService.createTokens({
+      const jwt = this.tokenService.createTokens(account.id, {
         id: account.id,
         email: account.email,
       });
-      this.credentialsService.sendVerificationCode(email);
+
+      // this.credentialsService.sendVerificationCode(email);
       return { credentials: { id: account.id, email: account.email }, jwt };
     } else throw new HttpException('Wrong username or password', 401);
+  }
+
+  async logout(email: string) {
+    if (!isEmail(email)) throw new BadRequestException();
+    const account = await this.credentialsService.findOne(email);
+    if (!account) {
+      throw new HttpException('Wrong username or password', 401);
+    }
+    this.tokenService.removeTokenRecord(account.id);
+    return { status: 200 };
   }
 }

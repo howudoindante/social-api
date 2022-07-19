@@ -24,6 +24,10 @@ type Login {
   jwt: JWT!
 }
 
+type Status {
+  status: Int!
+}
+
 type PrivateCredentials {
   """Unique id field"""
   id: Float!
@@ -44,11 +48,6 @@ type PrivateCredentials {
   isActivated: Boolean!
 }
 
-type Token {
-  """Example field (placeholder)"""
-  exampleField: Int!
-}
-
 type Query {
   requestVerification: Auth!
   getCredentials(accessToken: String!, email: String!): PrivateCredentials!
@@ -57,19 +56,7 @@ type Query {
 type Mutation {
   verificateAccount(code: Float!): Auth!
   register(email: String!, password: String!): Auth!
+  logout(email: String!): Status!
   login(email: String!, password: String!): Login!
-  createToken(createTokenInput: CreateTokenInput!): Token!
-  updateToken(updateTokenInput: UpdateTokenInput!): Token!
-  removeToken(id: Int!): Token!
-}
-
-input CreateTokenInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
-}
-
-input UpdateTokenInput {
-  """Example field (placeholder)"""
-  exampleField: Int
-  id: Int!
+  getNewTokenPair(refreshToken: String!): JWT!
 }
